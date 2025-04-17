@@ -6,10 +6,10 @@ int print_and_return(FILE* fin, FILE* out);
 
 int main(int argc, char* argv[argc+1]) 
 {
+    // TODO: add argc > 3 check
 
     if (argc == 1) {
-        printf("reading from stdin not supported\n");
-        return 1;
+        print_and_return(stdin, stdout);
     }
 
     // Input file but no output; write to STDOUT
