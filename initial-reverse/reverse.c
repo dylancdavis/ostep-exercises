@@ -5,7 +5,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-int print_and_return(FILE* fin, FILE* out);
+void print_and_return(FILE* fin, FILE* out);
 
 int main(int argc, char* argv[argc+1]) 
 {
@@ -61,21 +61,17 @@ int main(int argc, char* argv[argc+1])
     }
 }
 
-int print_and_return(FILE* fin, FILE* fout) {
+void print_and_return(FILE* fin, FILE* fout) {
     if (feof(fin)) {
         fclose(fin);
-        return 0;
+        return;
     }
 
     char* line = NULL;
     size_t len = 0;
     getline(&line, &len, fin);
 
-    int r = print_and_return(fin, fout);
+    print_and_return(fin, fout);
     fprintf(fout, "%s", line);
-    if (r == 0) {
-        fputc('\n', fout);
-    }
     free(line);
-    return r+1;
 }
