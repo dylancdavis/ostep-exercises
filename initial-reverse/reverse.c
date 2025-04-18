@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 int print_and_return(FILE* fin, FILE* out);
 
@@ -30,11 +33,17 @@ int main(int argc, char* argv[argc+1])
 
     // Input and output file
     if (argc == 3) {
-        int v = strcmp(argv[1], argv[2]);
-        if (v == 0) {
+
+        struct stat fin_stat;
+        struct stat fout_stat;
+
+        stat(argv[1], &fin_stat);
+        stat(argv[2], &fout_stat);
+
+        if (fin_stat.st_ino == fout_stat.st_ino) {
             fprintf(stderr, "reverse: input and output file must differ\n");
             return 1;
-        };
+        }
 
         FILE* fin = fopen(argv[1], "r");
         if (fin == NULL) {
