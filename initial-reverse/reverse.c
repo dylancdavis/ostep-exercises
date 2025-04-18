@@ -7,8 +7,7 @@ int print_and_return(FILE* fin, FILE* out);
 int main(int argc, char* argv[argc+1]) 
 {
     if (argc > 3) {
-        printf("usage: reverse <input> <output>");
-        fprintf(stderr, "usage: reverse <input> <output>");
+        fprintf(stderr, "usage: reverse <input> <output>\n");
         return 1;
     }
 
@@ -20,8 +19,7 @@ int main(int argc, char* argv[argc+1])
     if (argc == 2) {
         FILE* fin = fopen(argv[1], "r");
         if (fin == NULL) {
-            printf("error: cannot open file '%s'", argv[1]);
-            fprintf(stderr, "error: cannot open file '%s'", argv[1]);
+            fprintf(stderr, "reverse: cannot open file '%s'\n", argv[1]);
             
             return 1;
         }
@@ -34,22 +32,19 @@ int main(int argc, char* argv[argc+1])
     if (argc == 3) {
         int v = strcmp(argv[1], argv[2]);
         if (v == 0) {
-            printf("Input and output file must differ");
-            fprintf(stderr, "Input and output file must differ");
+            fprintf(stderr, "reverse: input and output file must differ\n");
             return 1;
         };
 
         FILE* fin = fopen(argv[1], "r");
         if (fin == NULL) {
-            printf("error: cannot open file '%s'", argv[1]);
-            fprintf(stderr, "error: cannot open file '%s'", argv[1]);
+            fprintf(stderr, "reverse: cannot open file '%s'\n", argv[1]);
             return 1;
         }
 
         FILE* fout = fopen(argv[2], "w");
         if (fout == NULL) {
-            printf("error: cannot open file '%s'", argv[2]);
-            fprintf(stderr, "error: cannot open file '%s'", argv[2]);
+            fprintf(stderr, "reverse: cannot open file '%s'\n", argv[2]);
             return 1;
         }
 
