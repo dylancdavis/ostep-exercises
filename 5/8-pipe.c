@@ -18,26 +18,29 @@ int main(void)
         int id2 = fork();
         
         if (id2 != 0) {
-            //
             return 0;
         } else {
-            puts("Child process 2");
-            close(pipefd[1]); // in second child close pipe write end
+            close(pipefd[1]);
+
+            FILE* f = fdopen(pipefd[0], "r");
             
             // read in pipe input and print to stdout
-            char buf;
-            while (read(pipefd[0], &buf, 1) > 0) {
-                putc(buf, stdout);
+            char c = getc(f);
+            while (c != EOF) {
+                putchar(c);
+                fflush(stdout);
+                c = getc(f);
             }
-            close(pipefd[0]); // close read after finish
+            putchar('\n');
+            fflush(stdout);
+            fclose(f);
+            close(pipefd[0]);
         }
         
     } else {
-        puts("Child process 1");
-        close(pipefd[0]); // in first child close pipe read end
-
+        close(pipefd[0]);
         FILE* f = fdopen(pipefd[1], "w");
         fputs("foobar", f); // write foobar to pipe
-        close(pipefd[1]); // close pipe write end
+        fclose(f);
     }
 }
