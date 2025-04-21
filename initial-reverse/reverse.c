@@ -40,11 +40,6 @@ int main(int argc, char* argv[argc+1])
         stat(argv[1], &fin_stat);
         stat(argv[2], &fout_stat);
 
-        if (fin_stat.st_ino == fout_stat.st_ino) {
-            fprintf(stderr, "reverse: input and output file must differ\n");
-            return 1;
-        }
-
         FILE* fin = fopen(argv[1], "r");
         if (fin == NULL) {
             fprintf(stderr, "reverse: cannot open file '%s'\n", argv[1]);
@@ -54,6 +49,11 @@ int main(int argc, char* argv[argc+1])
         FILE* fout = fopen(argv[2], "w");
         if (fout == NULL) {
             fprintf(stderr, "reverse: cannot open file '%s'\n", argv[2]);
+            return 1;
+        }
+
+        if (fin_stat.st_ino == fout_stat.st_ino) {
+            fprintf(stderr, "reverse: input and output file must differ\n");
             return 1;
         }
 
