@@ -5,7 +5,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-void print_and_return(FILE* fin, FILE* out);
+void print_reverse(FILE* fin, FILE* fout);
 
 int main(int argc, char* argv[argc+1]) 
 {
@@ -15,7 +15,7 @@ int main(int argc, char* argv[argc+1])
     }
 
     if (argc == 1) {
-        print_and_return(stdin, stdout);
+        print_reverse(stdin, stdout);
     }
 
     // Input file but no output; write to STDOUT
@@ -27,7 +27,7 @@ int main(int argc, char* argv[argc+1])
             return 1;
         }
 
-        print_and_return(fin, stdout);
+        print_reverse(fin, stdout);
         return 0;
     }
 
@@ -57,21 +57,42 @@ int main(int argc, char* argv[argc+1])
             return 1;
         }
 
-        print_and_return(fin, fout);
+        print_reverse(fin, fout);
     }
 }
 
-void print_and_return(FILE* fin, FILE* fout) {
-    if (feof(fin)) {
-        fclose(fin);
-        return;
+void print_reverse(FILE* fin, FILE* fout) {
+    // read fin, count lines.
+    int num_lines = -1;
+    while (!feof(fin)) {
+        char* line = NULL;
+        size_t len = 0;
+        getline(&line, &len, fin);
+        num_lines++;
+        free(line);
     }
 
-    char* line = NULL;
-    size_t len = 0;
-    getline(&line, &len, fin);
+    // reset fin
+    rewind(fin);
 
-    print_and_return(fin, fout);
-    fprintf(fout, "%s", line);
-    free(line);
+    char** lines = malloc(num_lines * sizeof(char*));
+    if (lines == NULL) {
+        printf("malloc failed");
+        exit(1);
+    }
+
+    for (int i=0; i<num_lines; i++) {
+        char* line = NULL;
+        size_t len = 0;
+        ssize_t res = getline(&line, &len, fin);
+        if (res == -1) {
+            printf("malloc failed");
+            exit(1);
+        }
+        lines[i] = line;
+    }
+
+    for (int i=num_lines-1; i>=0; i--) {
+        fprintf(fout, "%s", lines[i]);
+    }
 }
