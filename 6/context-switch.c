@@ -14,8 +14,27 @@ int main(void)
         tv_usec : 0
     };
 
-    int num_evaluations = 1000000;
+    int num_evaluations = 2;
 
+    // Create pipes
+    int pipefd1[2];
+    int pipefd2[2];
+
+    int ret = pipe(pipefd2);
+    if (ret == -1)
+    {
+        puts("Error creating pipe");
+        return 1;
+    }
+
+    ret = pipe(pipefd2);
+    if (ret == -1)
+    {
+        puts("Error creating pipe");
+        return 1;
+    }
+
+    // Get starting time
     int tret = gettimeofday(&start_time, NULL);
     if (tret != 0)
     {
@@ -23,14 +42,42 @@ int main(void)
         return 1;
     };
 
-    // TODO: fork two processes and wait for them both to return
-    // In each process, write to the pipe, then wait for a read.
-    // Do this a total of num_evaluation times
-    // And then return
+    int child_pid = fork();
 
-    for (int i = 0; i < num_evaluations; i++)
+    // Case: Parent process
+    if (child_pid != 0)
     {
-        // Main iterative loop here to be placed inside processes
+        close(pipefd1[0]); // close first pipe read end
+        close(pipefd2[1]); // and second pipe write end
+
+        FILE *f1 = fdopen(pipefd1[1], "w");
+        FILE *f2 = fdopen(pipefd2[0], "r");
+
+        for (int i = 0; i < num_evaluations; i++)
+        {
+            // Write to the first pipe and read from the second
+            fputc('a', f1);
+            char c = fgetc(f2);
+            printf("Parent received from pipe #2: %c\n", c);
+        }
+        fclose(f1);
+    }
+    else
+    // Case: Child process
+    {
+        close(pipefd1[1]); // close first pipe write end
+        close(pipefd2[0]); // and second pipe read end
+
+        FILE *f1 = fdopen(pipefd1[0], "r");
+        FILE *f2 = fdopen(pipefd2[1], "w");
+
+        char c = getc(f1);
+        while (c != EOF)
+        {
+            printf("Child received from pipe #1: %c\n", c);
+            fputc('b', f2);
+            c = getc(f1);
+        }
     }
 
     tret = gettimeofday(&end_time, NULL);
